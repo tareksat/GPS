@@ -46,6 +46,3 @@ server.on('close',function(){
 
 server.bind(3001);
 
-setTimeout(function(){
-server.close();
-},8000);
