@@ -13,7 +13,13 @@ server.on('error',function(error){
 
 // emits on new datagram msg
 server.on('message',function(msg,info){
-  console.log(messageDecoding(msg.toString()));
+  try{
+    console.log(messageDecoding(msg.toString()));
+  }
+  catch(error){
+    console.log(error.message);
+  }
+  
   //console.log('Data received from client : ' + msg.toString());
  // console.log('Received %d bytes from %s:%d\n',msg.length, info.address, info.port);
 
