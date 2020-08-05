@@ -13,8 +13,9 @@ server.on('error',function(error){
 
 // emits on new datagram msg
 server.on('message',function(msg,info){
-  console.log('Data received from client : ' + msg.toString());
-  console.log('Received %d bytes from %s:%d\n',msg.length, info.address, info.port);
+  console.log(messageDecoding(msg.toString()));
+  //console.log('Data received from client : ' + msg.toString());
+ // console.log('Received %d bytes from %s:%d\n',msg.length, info.address, info.port);
 
 //sending msg
 server.send(msg,info.port,'localhost',function(error){
@@ -43,6 +44,42 @@ server.on('listening',function(){
 server.on('close',function(){
   console.log('Socket is closed !');
 });
+
+////////////////////////// Decoding Received Data /////////////////////////
+
+messageDecoding = (message) => {
+  let id, keyword, phone, time, latitude, longitude, speed, ac_state, door_state, fuel_leve, temp;
+  y = message.split(':')[1].split(',');
+  id = y[0];
+  keyword = y[1];
+  time = y[2];
+  phone = y[3];
+  latitude = y[7];
+  longitude = y[9];
+  speed = y[11];
+  ac_state = y[14];
+  door_state = y[15];
+  fuel_level = y[16];
+  temp = y[18];
+  
+  const data = {
+      id,
+      keyword,
+      time,
+      phone,
+      latitude,
+      longitude,
+      speed,
+      ac_state,
+      door_state,
+      fuel_level,
+      temp
+  }
+  return(data);
+
+}
+
+//////////////////////////////////////////////////////////////////////////
 
 server.bind(3001);
 
