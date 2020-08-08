@@ -1,0 +1,26 @@
+{
+  "name": "gps",
+  "version": "1.0.0",
+  "description": "GPS Tracker Demo Server",
+  "main": "index.js",
+  "dependencies": {
+    "debug": "^4.1.1",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.28",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tareksat/GPS.git"
+  },
+  "author": "Tarek Morshed",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tareksat/GPS/issues"
+  },
+  "homepage": "https://github.com/tareksat/GPS#readme"
+}
