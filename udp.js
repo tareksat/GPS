@@ -1,51 +1,71 @@
-var udp = require("dgram");
-var decode = require("./msg_dec");
+let udp = require("dgram");
+let { update, findByImei } = require("./database/modules_database");
+const { tk303GetImei } = require("./adapters/tk303");
+const { route } = require("./adapters/adapter_interface");
 
-// --------------------creating a udp server --------------------
+var server;
 
-// creating a udp server
-var server = udp.createSocket("udp4");
+function createUdpServer(portNum) {
+  server = udp.createSocket("udp4");
 
-// emits when any error occurs
-server.on("error", function (error) {
-  console.log("Error: " + error);
-  server.close();
-});
+  server.on("error", function (error) {
+    console.log("Error: " + error);
+    server.close();
+  });
 
-// emits on new datagram msg
-server.on("message", function (msg, info) {
-  try {
-    console.log(decode(msg.toString()));
-  } catch (error) {
-    console.log(error.message);
-  }
+  server.on("message", function (msg, info) {
+    try {
+      submitGpsData(msg.toString(), info.address, info.port);
+    } catch (error) {
+      console.log(error.message);
+    }
+  });
 
-  //console.log('Data received from client : ' + msg.toString());
-  // console.log('Received %d bytes from %s:%d\n',msg.length, info.address, info.port);
+  server.on("listening", function () {
+    console.log("Server is listening at port " + portNum);
+  });
 
-  //sending msg
-  server.send("ON", info.port, "localhost", function (error) {
+  server.on("close", function () {
+    console.log("Socket is closed !");
+  });
+
+  server.bind(portNum);
+}
+
+function sendToGPS(data, ip, port) {
+  server.send(data, port, ip, function (error) {
     if (error) {
       client.close();
     } else {
     }
   });
-});
+}
 
-//emits when socket is ready and listening for datagram msgs
-server.on("listening", function () {
-  var address = server.address();
-  var port = address.port;
-  var family = address.family;
-  var ipaddr = address.address;
-  console.log("Server is listening at port" + port);
-  console.log("Server ip :" + ipaddr);
-  console.log("Server is IP4/IP6 : " + family);
-});
+//////////////////  interface /////////////////////////////////
 
-//emits after the socket is closed using socket.close();
-server.on("close", function () {
-  console.log("Socket is closed !");
-});
+///////////////////////////////   interface functions //////////////////////////////
+/*
+   1. Get gps module data from udp server and do the follwoing :
+    a. authenticate device : 
+      1). If OK update ip, port, data, and status to online.
+      2). Call GPS adpater according to GPS Type.
 
-server.bind(3001);
+  2. respond to incomming command from express API and send codes to corresponding GPS module
+
+  
+
+*/
+
+async function submitGpsData(data, ip, port) {
+  route(data, ip, port, function (res) {
+    if (res) {
+      sendToGPS(res, ip, port);
+    } else {
+      console.log("Not Authinticated Module...");
+    }
+  });
+}
+
+///////////////////////////////////////////////////////////////
+
+module.exports.createUdpServer = createUdpServer;
